@@ -1,4 +1,6 @@
 const express = require('express');
+const axios = require('axios');
+
 let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
@@ -90,7 +92,7 @@ public_users.get('/author/:author', function (req, res) {
 });
 
 
-// Get all books based on title
+// Get books based on title
 public_users.get('/title/:title', function (req, res) {
   const title = req.params.title.toLowerCase();
 
@@ -110,7 +112,7 @@ public_users.get('/title/:title', function (req, res) {
 });
 
 
-// Get book review
+// Get book reviews
 public_users.get('/review/:isbn', function (req, res) {
   const isbn = req.params.isbn;
 
@@ -124,4 +126,61 @@ public_users.get('/review/:isbn', function (req, res) {
 });
 
 
+// ======================================================
+// AXIOS IMPLEMENTATIONS FOR TASKS 10-13
+// ======================================================
+
+// Task 10 - Axios async/await implementation
+async function getAllBooks() {
+  try {
+    const response = await axios.get('http://localhost:5000/');
+    return response.data;
+  } catch (error) {
+    return books;
+  }
+}
+
+
+// Task 11 - Axios Promise implementation for ISBN
+function getBookByISBN(isbn) {
+  return axios.get('http://localhost:5000/isbn/' + isbn)
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      return books[isbn];
+    });
+}
+
+
+// Task 12 - Axios async/await implementation for Author
+async function getBooksByAuthor(author) {
+  try {
+    const response = await axios.get(
+      'http://localhost:5000/author/' + encodeURIComponent(author)
+    );
+    return response.data;
+  } catch (error) {
+    return [];
+  }
+}
+
+
+// Task 13 - Axios async/await implementation for Title
+async function getBooksByTitle(title) {
+  try {
+    const response = await axios.get(
+      'http://localhost:5000/title/' + encodeURIComponent(title)
+    );
+    return response.data;
+  } catch (error) {
+    return [];
+  }
+}
+
+
 module.exports.general = public_users;
+module.exports.getAllBooks = getAllBooks;
+module.exports.getBookByISBN = getBookByISBN;
+module.exports.getBooksByAuthor = getBooksByAuthor;
+module.exports.getBooksByTitle = getBooksByTitle;
